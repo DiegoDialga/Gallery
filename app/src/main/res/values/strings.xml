@@ -16,4 +16,6 @@
     <string name="swap_first_for_last">Swap first for last</string>
     <string name="grid_view">Grid View</string>
     <string name="tinder_view">Tinder View</string>
+    <string name="delete">Delete</string>
+    <string name="set_wallpaper">Set Wallpaper</string>
 </resources>

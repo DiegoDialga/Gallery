@@ -27,6 +27,7 @@ import com.example.gallery.DataClass.Image
 import com.example.gallery.Objects.ImagesInStorage.getAllImages
 import com.example.gallery.R
 import com.example.gallery.SpotDiffCallback
+import com.google.android.material.floatingactionbutton.FloatingActionButton
 import com.google.android.material.navigation.NavigationView
 import com.yuyakaido.android.cardstackview.*
 import java.util.ArrayList
@@ -42,6 +43,7 @@ class MainActivity : AppCompatActivity(), CardStackListener {
     private val cardStackView by lazy { findViewById<CardStackView>(R.id.card_stack_view) }
     private val manager by lazy { CardStackLayoutManager(this, this) }
     private val adapter by lazy { CardStackAdapter(CreateImages.createSpots(this@MainActivity)) }
+    private val rewind by lazy { findViewById<FloatingActionButton>(R.id.rewind_button) }
 
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -56,10 +58,10 @@ class MainActivity : AppCompatActivity(), CardStackListener {
         imageRecycler?.setHasFixedSize(true)
 
 
-        if(ContextCompat.checkSelfPermission(
+        if((ContextCompat.checkSelfPermission(
                 this, android.Manifest.permission.READ_EXTERNAL_STORAGE
-            ) != PackageManager.PERMISSION_GRANTED){
-            ActivityCompat.requestPermissions(this, arrayOf(android.Manifest.permission.READ_EXTERNAL_STORAGE), 101)
+            ) != PackageManager.PERMISSION_GRANTED) || (ContextCompat.checkSelfPermission(this, android.Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED)){
+            ActivityCompat.requestPermissions(this, arrayOf(android.Manifest.permission.READ_EXTERNAL_STORAGE, android.Manifest.permission.WRITE_EXTERNAL_STORAGE), 101)
         }
             setupNavigation()
             setupCardStackView()
@@ -114,15 +116,18 @@ class MainActivity : AppCompatActivity(), CardStackListener {
         navigationView.setNavigationItemSelectedListener { menuItem ->
             when (menuItem.itemId) {
                 R.id.gridViewOption -> {
-                        allPictures = getAllImages(this@MainActivity)
-                        imageRecycler?.adapter = GridViewAdapter(this, allPictures!!)
+                    allPictures = getAllImages(this@MainActivity)
+                    imageRecycler?.adapter = GridViewAdapter(this, allPictures!!)
                     cardStackView.isInvisible = true
                     activityGridView.isVisible = true
+                    rewind.isVisible = false
+
                 }
 
                 R.id.tinderViewOption -> {
                     activityGridView.isInvisible = true
                     cardStackView.isVisible = true
+                    rewind.isVisible = true
                 }
             }
             drawerLayout.closeDrawers()
@@ -135,8 +140,6 @@ class MainActivity : AppCompatActivity(), CardStackListener {
     }
 
     private fun setupButton() {
-
-        val rewind = findViewById<View>(R.id.rewind_button)
         rewind.setOnClickListener {
             val setting = RewindAnimationSetting.Builder()
                 .setDirection(Direction.Bottom)
